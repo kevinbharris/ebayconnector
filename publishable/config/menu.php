@@ -4,16 +4,9 @@ return [
     [
         'key'        => 'ebayconnector',
         'name'       => 'eBay Connector',
-        'route'      => 'ebayconnector.admin.configuration.index',
+        'route'      => 'admin.configuration.index',
         'sort'       => 7,
         'icon'       => 'icon-integration',
-    ],
-    [
-        'key'        => 'ebayconnector.configuration',
-        'name'       => 'Configuration',
-        'route'      => 'ebayconnector.admin.configuration.index',
-        'sort'       => 1,
-        'icon'       => '',
     ],
     [
         'key'        => 'ebayconnector.products',

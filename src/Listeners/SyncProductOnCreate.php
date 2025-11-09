@@ -20,7 +20,7 @@ class SyncProductOnCreate
      */
     public function handle(ProductCreated $event): void
     {
-        if (!config('ebayconnector.auto_sync.products')) {
+        if (!core()->getConfigData('sales.carriers.ebayconnector.sync.auto_sync_products')) {
             return;
         }
 
