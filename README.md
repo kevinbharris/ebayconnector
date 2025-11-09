@@ -116,7 +116,45 @@ Obtain your eBay API credentials from the [eBay Developer Portal](https://develo
 
 For more details on the configuration migration, see [CONFIGURATION_MIGRATION.md](CONFIGURATION_MIGRATION.md).
 
-### 3. Environment Variables (Optional)
+### 3. OAuth Configuration
+
+#### Setting Up OAuth Callback
+
+The package provides a public OAuth callback endpoint for eBay authentication:
+
+**Callback URL**: `https://yourdomain.com/ebay/oauth/callback`
+
+To configure OAuth for your eBay application:
+
+1. Log in to the [eBay Developer Portal](https://developer.ebay.com/)
+2. Go to your application settings
+3. Under **OAuth Redirect URLs**, add your callback URL:
+   - For production: `https://yourdomain.com/ebay/oauth/callback`
+   - For sandbox/testing: `https://yourdomain.test/ebay/oauth/callback`
+4. Save your application settings
+
+#### Testing the OAuth Callback
+
+You can test the OAuth callback endpoint by accessing:
+
+```
+GET /ebay/oauth/callback?code=YOUR_AUTH_CODE
+```
+
+The endpoint will respond with a JSON indicating success or failure:
+
+```json
+{
+  "success": true,
+  "message": "OAuth callback received successfully",
+  "code": "YOUR_AUTH_CODE",
+  "note": "Token exchange logic can be implemented here"
+}
+```
+
+**Note**: This endpoint is publicly accessible (no authentication required) so that eBay can redirect users back after authorization. The callback currently accepts the authorization code and can be extended to exchange it for access tokens.
+
+### 4. Environment Variables (Optional)
 
 You can still use environment variables for default values. These are defined in `publishable/config/ebayconnector.php` and serve as fallbacks:
 
