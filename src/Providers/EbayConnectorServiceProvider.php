@@ -111,10 +111,12 @@ class EbayConnectorServiceProvider extends ServiceProvider
      */
     protected function registerMenuItems(): void
     {
-        $menuItems = require __DIR__ . '/../../publishable/config/menu.php';
+        if ($this->app->bound('core')) {
+            $menuItems = require __DIR__ . '/../../publishable/config/menu.php';
 
-        foreach ($menuItems as $menuItem) {
-            $this->app['core']->addMenuItems($menuItem);
+            foreach ($menuItems as $menuItem) {
+                $this->app['core']->addMenuItems($menuItem);
+            }
         }
     }
 
@@ -123,10 +125,12 @@ class EbayConnectorServiceProvider extends ServiceProvider
      */
     protected function registerACL(): void
     {
-        $aclItems = require __DIR__ . '/../../publishable/config/acl.php';
+        if ($this->app->bound('core')) {
+            $aclItems = require __DIR__ . '/../../publishable/config/acl.php';
 
-        foreach ($aclItems as $aclItem) {
-            $this->app['core']->addACL($aclItem);
+            foreach ($aclItems as $aclItem) {
+                $this->app['core']->addACL($aclItem);
+            }
         }
     }
 }
