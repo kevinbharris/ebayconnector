@@ -220,7 +220,7 @@ The package includes a custom icon font featuring a black and white eBay logo th
 - `ebay-icons.ttf` - TrueType Font (fallback)
 - `ebay-icons.svg` - SVG font (legacy browsers)
 
-The icon font is published to `public/vendor/ebayconnector/fonts/ebay/` and the CSS to `public/vendor/ebayconnector/css/ebay-icons.css` when you run:
+The icon font is published to `public/vendor/ebayconnector/fonts/ebay/` and the CSS to `public/vendor/ebayconnector/css/app.css` when you run:
 
 ```bash
 php artisan vendor:publish --tag=ebayconnector-assets

@@ -339,12 +339,12 @@ foreach ($requiredFontFiles as $fontFile) {
 }
 
 // Check for CSS file
-if (!file_exists('publishable/assets/css/ebay-icons.css')) {
-    $errors[] = "Missing CSS file: publishable/assets/css/ebay-icons.css";
+if (!file_exists('publishable/assets/css/app.css')) {
+    $errors[] = "Missing CSS file: publishable/assets/css/app.css";
     $assetsTest = false;
 } else {
     // Validate CSS content
-    $cssContent = file_get_contents('publishable/assets/css/ebay-icons.css');
+    $cssContent = file_get_contents('publishable/assets/css/app.css');
     if (strpos($cssContent, '@font-face') === false) {
         $errors[] = "CSS file doesn't contain @font-face definition";
         $assetsTest = false;
