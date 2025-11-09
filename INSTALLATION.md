@@ -15,7 +15,17 @@ This guide provides detailed instructions for installing and configuring the eBa
 
 ---
 
-## Installation Steps
+## Installation Methods
+
+You can install this package in two ways:
+1. **Via Composer** (recommended for production)
+2. **Direct from GitHub** (for development or manual installation)
+
+---
+
+## Method 1: Installation via Composer (Packagist)
+
+This is the recommended method for most users.
 
 ### Step 1: Install via Composer
 
@@ -60,6 +70,124 @@ php artisan config:clear
 php artisan cache:clear
 php artisan view:clear
 ```
+
+---
+
+## Method 2: Installation from GitHub (Manual)
+
+If you've downloaded the package directly from GitHub or want to install it manually:
+
+### Step 1: Download the Package
+
+Option A - Clone the repository:
+```bash
+cd packages/kevinbharris
+git clone https://github.com/kevinbharris/ebayconnector.git
+```
+
+Option B - Download ZIP:
+1. Download the package from [GitHub](https://github.com/kevinbharris/ebayconnector)
+2. Extract it to `packages/kevinbharris/ebayconnector` in your Bagisto installation
+
+Your directory structure should look like:
+```
+your-bagisto-project/
+├── app/
+├── packages/
+│   └── kevinbharris/
+│       └── ebayconnector/
+│           ├── src/
+│           ├── resources/
+│           ├── publishable/
+│           ├── composer.json
+│           └── ...
+├── public/
+├── vendor/
+└── ...
+```
+
+### Step 2: Add Local Repository to Composer
+
+Edit your project's `composer.json` file and add the package to the repositories section:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/kevinbharris/ebayconnector",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
+}
+```
+
+### Step 3: Require the Package
+
+Install the package from the local repository:
+
+```bash
+composer require kevinbharris/ebayconnector:@dev
+```
+
+**Note**: The `@dev` flag tells Composer to use the local development version.
+
+### Step 4: Verify Installation
+
+Check that the package is installed:
+
+```bash
+composer show kevinbharris/ebayconnector
+```
+
+### Step 5: Publish Configuration Files
+
+Publish the configuration file:
+```bash
+php artisan vendor:publish --tag=ebayconnector-config
+```
+
+Publish the views (optional):
+```bash
+php artisan vendor:publish --tag=ebayconnector-views
+```
+
+Publish the assets:
+```bash
+php artisan vendor:publish --tag=ebayconnector-assets
+```
+
+### Step 6: Run Migrations
+
+Execute the database migrations:
+```bash
+php artisan migrate
+```
+
+This will create the following tables:
+- `ebay_configurations`
+- `ebay_product_mappings`
+- `ebay_order_mappings`
+- `ebay_sync_logs`
+
+### Step 7: Clear Cache
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+```
+
+### Step 8: Verify Package Registration
+
+Check if the service provider is loaded:
+```bash
+php artisan package:discover
+```
+
+You should see `KevinBHarris\EbayConnector\Providers\EbayConnectorServiceProvider` in the list.
 
 ---
 

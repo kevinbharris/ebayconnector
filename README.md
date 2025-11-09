@@ -24,6 +24,8 @@ A feature-rich connector that seamlessly synchronizes products and orders betwee
 
 ## Installation
 
+### Method 1: Via Composer (Recommended)
+
 1. Install the package via Composer:
 
 ```bash
@@ -53,6 +55,40 @@ php artisan vendor:publish --tag=ebayconnector-assets
 ```bash
 php artisan migrate
 ```
+
+### Method 2: Manual Installation from GitHub
+
+If you've downloaded the package from GitHub:
+
+1. Create a `packages/kevinbharris` directory in your Bagisto root
+2. Clone or extract the package into `packages/kevinbharris/ebayconnector`
+3. Add to your `composer.json`:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/kevinbharris/ebayconnector",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
+}
+```
+
+4. Install the package:
+
+```bash
+composer require kevinbharris/ebayconnector:@dev
+```
+
+5. Follow steps 2-5 from Method 1 above
+
+**For detailed GitHub installation instructions, see [GITHUB_INSTALL.md](GITHUB_INSTALL.md)**
+
+For complete installation guide, see [INSTALLATION.md](INSTALLATION.md).
 
 ## Configuration
 
