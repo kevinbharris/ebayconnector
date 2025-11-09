@@ -330,6 +330,76 @@ Make sure your cron is configured:
 
 ## Troubleshooting
 
+### Menu Not Appearing in Admin Sidebar
+
+If the "eBay Connector" menu doesn't appear in the Bagisto admin sidebar after installation:
+
+**Step 1: Verify Service Provider Registration**
+```bash
+php artisan package:discover
+```
+You should see `KevinBHarris\EbayConnector\Providers\EbayConnectorServiceProvider` in the output.
+
+If not listed, check `config/app.php` and verify the provider is in the `providers` array (Laravel should auto-discover it).
+
+**Step 2: Clear All Caches**
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+```
+
+**Step 3: Publish Package Resources**
+If not already done, publish the configuration files:
+```bash
+php artisan vendor:publish --tag=ebayconnector-config
+php artisan vendor:publish --tag=ebayconnector-views
+php artisan vendor:publish --tag=ebayconnector-assets
+```
+
+**Step 4: Check Laravel Logs**
+Review `storage/logs/laravel.log` for any warnings or errors related to eBay Connector:
+```bash
+tail -f storage/logs/laravel.log | grep "eBay Connector"
+```
+
+If you see warnings about "Bagisto core binding not found", this indicates:
+- Bagisto core may not be properly installed
+- You may be running the package outside a Bagisto environment
+- Service providers are loading in the wrong order
+
+**Step 5: Verify Bagisto Installation**
+Ensure Bagisto is properly installed and the `core` service is available:
+```bash
+php artisan tinker
+>>> app()->bound('core')
+```
+This should return `true` in a properly configured Bagisto installation.
+
+**Step 6: Check Admin User Permissions**
+Ensure your admin user has the necessary ACL permissions:
+1. Navigate to **Settings** → **Users** → **Roles**
+2. Edit your admin role
+3. Ensure "eBay Connector" permissions are checked
+4. Save and log out/in again
+
+**Step 7: Verify Database Tables**
+Check if migrations ran successfully:
+```bash
+php artisan migrate:status
+```
+You should see these tables:
+- `ebay_configurations`
+- `ebay_product_mappings`
+- `ebay_order_mappings`
+- `ebay_sync_logs`
+
+If missing, run:
+```bash
+php artisan migrate
+```
+
 ### Connection Test Fails
 - Verify API credentials are correct
 - Check if environment (sandbox/production) matches your credentials
@@ -344,11 +414,6 @@ Make sure your cron is configured:
 - Verify OAuth token is valid
 - Check API permissions for order access
 - Review sync logs for specific errors
-
-### Menu Not Appearing
-- Clear cache: `php artisan cache:clear`
-- Verify service provider is registered
-- Check ACL permissions for your admin role
 
 ---
 

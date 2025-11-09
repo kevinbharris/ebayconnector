@@ -4,6 +4,7 @@ namespace KevinBHarris\EbayConnector\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use KevinBHarris\EbayConnector\Console\Commands\SyncProductsCommand;
 use KevinBHarris\EbayConnector\Console\Commands\SyncOrdersCommand;
 use KevinBHarris\EbayConnector\Services\EbayApiClient;
@@ -117,6 +118,8 @@ class EbayConnectorServiceProvider extends ServiceProvider
             foreach ($menuItems as $menuItem) {
                 $this->app['core']->addMenuItems($menuItem);
             }
+        } else {
+            Log::warning('eBay Connector: Unable to register menu items. Bagisto core binding not found. Please ensure Bagisto is properly installed and cache is cleared.');
         }
     }
 
@@ -131,6 +134,8 @@ class EbayConnectorServiceProvider extends ServiceProvider
             foreach ($aclItems as $aclItem) {
                 $this->app['core']->addACL($aclItem);
             }
+        } else {
+            Log::warning('eBay Connector: Unable to register ACL permissions. Bagisto core binding not found. Please ensure Bagisto is properly installed and cache is cleared.');
         }
     }
 }

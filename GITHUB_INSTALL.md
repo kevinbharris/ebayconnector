@@ -159,6 +159,130 @@ You should see "eBay Connector" in the admin sidebar with submenu items:
 
 ## Troubleshooting GitHub Installation
 
+### eBay Connector Menu Not Appearing
+
+**This is the most common issue after installation.** If the "eBay Connector" menu doesn't appear in the Bagisto admin sidebar:
+
+#### Step 1: Verify Service Provider Registration
+```bash
+php artisan package:discover
+```
+
+You **must** see `KevinBHarris\EbayConnector\Providers\EbayConnectorServiceProvider` in the output.
+
+If not listed:
+```bash
+composer dump-autoload
+php artisan package:discover
+```
+
+#### Step 2: Clear All Caches (CRITICAL)
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+php artisan optimize:clear
+```
+
+**Important**: You must clear caches after installation for the menu to appear!
+
+#### Step 3: Verify Published Configuration
+```bash
+# Check if config file exists
+ls -la config/ebayconnector.php
+
+# If not found, publish it
+php artisan vendor:publish --tag=ebayconnector-config
+```
+
+#### Step 4: Check Laravel Logs
+```bash
+tail -100 storage/logs/laravel.log | grep "eBay Connector"
+```
+
+**Look for warnings like:**
+- "eBay Connector: Unable to register menu items. Bagisto core binding not found."
+- "eBay Connector: Unable to register ACL permissions. Bagisto core binding not found."
+
+If you see these warnings:
+- Ensure you're running this inside a **Bagisto installation**, not a standalone Laravel app
+- Verify Bagisto is properly installed and functional
+- Check that Bagisto's core service provider is loaded
+
+#### Step 5: Verify Bagisto Core Binding
+```bash
+php artisan tinker
+```
+Then type:
+```php
+app()->bound('core')
+```
+Press Enter. This **must** return `true`. If it returns `false`, Bagisto is not properly installed.
+
+To exit tinker, type `exit` and press Enter.
+
+#### Step 6: Check Admin User ACL Permissions
+1. Log in to Bagisto admin panel
+2. Navigate to **Settings** → **Users** → **Roles**
+3. Edit your admin role (e.g., "Administrator")
+4. Look for "eBay Connector" in the permissions list
+5. Ensure all eBay Connector permissions are checked
+6. Click **Save**
+7. Log out and log back in
+
+#### Step 7: Verify Database Tables Created
+```bash
+php artisan migrate:status | grep ebay
+```
+
+You should see:
+- `ebay_configurations`
+- `ebay_product_mappings`
+- `ebay_order_mappings`
+- `ebay_sync_logs`
+
+If missing, run:
+```bash
+php artisan migrate
+```
+
+#### Step 8: Hard Refresh and Browser Cache
+- Clear your browser cache
+- Hard refresh (Ctrl+F5 or Cmd+Shift+R)
+- Try a different browser or incognito mode
+- Log out and log back in to admin panel
+
+#### Still Not Working?
+
+**Complete Reset Procedure:**
+```bash
+# 1. Clear everything
+php artisan optimize:clear
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+
+# 2. Dump autoload
+composer dump-autoload
+
+# 3. Re-publish configs
+php artisan vendor:publish --tag=ebayconnector-config --force
+php artisan vendor:publish --tag=ebayconnector-views --force
+php artisan vendor:publish --tag=ebayconnector-assets --force
+
+# 4. Clear caches again
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+
+# 5. Restart queue workers if running
+php artisan queue:restart
+```
+
+Then log out and log back in to the admin panel.
+
 ### Package Not Found
 
 **Problem**: `composer require` can't find the package
@@ -168,18 +292,6 @@ You should see "eBay Connector" in the admin sidebar with submenu items:
 - Check your `composer.json` has the correct repository path
 - Make sure the path is relative to the composer.json location
 - Run `composer update --no-scripts`
-
-### Service Provider Not Loaded
-
-**Problem**: Menu doesn't appear in admin panel
-
-**Solution**:
-```bash
-composer dump-autoload
-php artisan optimize:clear
-php artisan config:clear
-php artisan cache:clear
-```
 
 ### Symlink Issues (Windows)
 
