@@ -1,0 +1,10 @@
+{
+    "name": "kevinbharris-ebayconnector",
+    "version": "1.0.0",
+    "description": "Synchronize your products and orders between Bagisto and eBay",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    }
+}
