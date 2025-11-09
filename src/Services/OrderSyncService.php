@@ -165,7 +165,7 @@ class OrderSyncService
         
         $orderData = [
             'increment_id' => 'EBAY-' . $ebayOrder['orderId'],
-            'status' => config('ebayconnector.order_sync.default_order_status', 'pending'),
+            'status' => core()->getConfigData('sales.carriers.ebayconnector.order_sync.default_order_status') ?? 'pending',
             'channel_name' => 'eBay',
             'is_guest' => 0,
             'customer_email' => $ebayOrder['buyer']['buyerEmail'] ?? 'noreply@ebay.com',
@@ -226,7 +226,7 @@ class OrderSyncService
         ?array $requestData = null,
         ?array $responseData = null
     ): void {
-        if (!config('ebayconnector.logging.enabled')) {
+        if (!core()->getConfigData('sales.carriers.ebayconnector.logging.enabled')) {
             return;
         }
 

@@ -17,12 +17,16 @@ class EbayApiClient
 
     public function __construct(?string $apiKey = null, ?string $apiSecret = null, ?string $environment = 'sandbox')
     {
-        $this->apiKey = $apiKey ?? config('ebayconnector.api_key');
-        $this->apiSecret = $apiSecret ?? config('ebayconnector.api_secret');
-        $this->environment = $environment ?? config('ebayconnector.environment', 'sandbox');
+        $this->apiKey = $apiKey ?? core()->getConfigData('sales.carriers.ebayconnector.api_key');
+        $this->apiSecret = $apiSecret ?? core()->getConfigData('sales.carriers.ebayconnector.api_secret');
+        $this->environment = $environment ?? core()->getConfigData('sales.carriers.ebayconnector.environment') ?? 'sandbox';
         
+        $apiEndpoint = $this->environment === 'production' 
+            ? config('ebayconnector.api_endpoints.production')
+            : config('ebayconnector.api_endpoints.sandbox');
+            
         $this->client = new Client([
-            'base_uri' => config("ebayconnector.api_endpoints.{$this->environment}"),
+            'base_uri' => $apiEndpoint,
             'timeout' => 30,
         ]);
     }
@@ -45,8 +49,12 @@ class EbayApiClient
 
         // Generate new token
         try {
+            $oauthEndpoint = $this->environment === 'production'
+                ? config('ebayconnector.oauth_endpoints.production')
+                : config('ebayconnector.oauth_endpoints.sandbox');
+                
             $response = $this->client->post(
-                config("ebayconnector.oauth_endpoints.{$this->environment}"),
+                $oauthEndpoint,
                 [
                     'headers' => [
                         'Content-Type' => 'application/x-www-form-urlencoded',

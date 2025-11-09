@@ -1,25 +1,42 @@
 <?php
 
-namespace KevinBHarris\Support\Providers;
+namespace KevinBHarris\EbayConnector\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Event;
-use Webkul\Admin\Helpers\Menu;
+use KevinBHarris\EbayConnector\Console\Commands\SyncProductsCommand;
+use KevinBHarris\EbayConnector\Console\Commands\SyncOrdersCommand;
 
-class SupportServiceProvider extends ServiceProvider
+class EbayConnectorServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
      */
     public function register(): void
     {
+        // Merge package configuration
         $this->mergeConfigFrom(
-            dirname(__DIR__) . '/Config/support.php', 'support'
+            dirname(__DIR__, 2) . '/publishable/config/ebayconnector.php', 
+            'ebayconnector'
         );
         
+        // Register system configuration for Bagisto admin panel
         $this->mergeConfigFrom(
-            dirname(__DIR__).'/Config/menu.php',
+            dirname(__DIR__, 2) . '/publishable/config/system.php',
+            'core'
+        );
+        
+        // Merge menu configuration
+        $this->mergeConfigFrom(
+            dirname(__DIR__, 2) . '/publishable/config/menu.php',
             'menu.admin'
+        );
+        
+        // Merge ACL configuration
+        $this->mergeConfigFrom(
+            dirname(__DIR__, 2) . '/publishable/config/acl.php',
+            'acl'
         );
     }
 
@@ -28,48 +45,54 @@ class SupportServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Load migrations
         $this->loadMigrationsFrom(dirname(__DIR__) . '/Database/Migrations');
         
-        $this->loadRoutesFrom(dirname(__DIR__) . '/Routes/admin.php');
-        $this->loadRoutesFrom(dirname(__DIR__) . '/Routes/portal.php');
+        // Load routes
+        Route::group([
+            'prefix' => 'admin/ebayconnector',
+            'middleware' => ['web', 'admin']
+        ], function () {
+            require dirname(__DIR__) . '/Http/routes.php';
+        });
         
-        $this->loadViewsFrom(dirname(__DIR__) . '/Resources/views', 'support');
+        // Load views
+        $this->loadViewsFrom(dirname(__DIR__, 2) . '/resources/views', 'ebayconnector');
         
-        $this->loadTranslationsFrom(dirname(__DIR__) . '/Resources/lang', 'support');
+        // Load translations
+        $this->loadTranslationsFrom(dirname(__DIR__, 2) . '/resources/lang', 'ebayconnector');
         
+        // Register commands
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \KevinBHarris\Support\Console\Commands\AutoTransitionTicketsByRule::class,
+                SyncProductsCommand::class,
+                SyncOrdersCommand::class,
             ]);
 
+            // Publish configuration files
             $this->publishes([
-                dirname(__DIR__) . '/Config/support.php' => config_path('support.php'),
-            ], 'support-config');
+                dirname(__DIR__, 2) . '/publishable/config/ebayconnector.php' => config_path('ebayconnector.php'),
+            ], 'ebayconnector-config');
             
             $this->publishes([
-                dirname(__DIR__) . '/Config/menu.php' => config_path('menu.php'),
-            ], 'support-config');
+                dirname(__DIR__, 2) . '/publishable/config/system.php' => config_path('ebayconnector_system.php'),
+            ], 'ebayconnector-config');
             
             $this->publishes([
-                dirname(__DIR__) . '/Resources/views' => resource_path('views/vendor/support'),
-            ], 'support-views');
+                dirname(__DIR__, 2) . '/publishable/config/menu.php' => config_path('ebayconnector_menu.php'),
+            ], 'ebayconnector-config');
             
             $this->publishes([
-                dirname(__DIR__) . '/Resources/assets' => public_path('vendor/support'),
-            ], 'support-assets');
+                dirname(__DIR__, 2) . '/publishable/config/acl.php' => config_path('ebayconnector_acl.php'),
+            ], 'ebayconnector-config');
             
+            // Publish views
             $this->publishes([
-                dirname(__DIR__) . '/Resources/lang' => resource_path('lang/vendor/support'),
-            ], 'support-lang');
-        }	
-		
-		// Inject the CSS into the Bagisto admin layout
-		view()->composer('*', function ($view) {
-			$view->getFactory()->startPush('styles');
-			echo '<link rel="stylesheet" href="' . asset('vendor/support/css/app.css') . '">';
-			$view->getFactory()->stopPush();
-		});
+                dirname(__DIR__, 2) . '/resources/views' => resource_path('views/vendor/ebayconnector'),
+            ], 'ebayconnector-views');
+        }
         
+        // Register event listeners
         $this->registerEventListeners();
     }
 
@@ -79,18 +102,13 @@ class SupportServiceProvider extends ServiceProvider
     protected function registerEventListeners(): void
     {
         Event::listen(
-            \KevinBHarris\Support\Events\TicketCreated::class,
-            \KevinBHarris\Support\Listeners\SendTicketCreatedNotification::class
+            \KevinBHarris\EbayConnector\Events\ProductSyncedToEbay::class,
+            \KevinBHarris\EbayConnector\Listeners\SyncProductOnCreate::class
         );
         
         Event::listen(
-            \KevinBHarris\Support\Events\TicketUpdated::class,
-            \KevinBHarris\Support\Listeners\SendTicketUpdatedNotification::class
-        );
-        
-        Event::listen(
-            \KevinBHarris\Support\Events\NoteAdded::class,
-            \KevinBHarris\Support\Listeners\SendNoteAddedNotification::class
+            \KevinBHarris\EbayConnector\Events\OrderSyncedFromEbay::class,
+            \KevinBHarris\EbayConnector\Listeners\SyncProductOnUpdate::class
         );
     }
 }

@@ -262,7 +262,7 @@ class ProductSyncService
         ?array $requestData = null,
         ?array $responseData = null
     ): void {
-        if (!config('ebayconnector.logging.enabled')) {
+        if (!core()->getConfigData('sales.carriers.ebayconnector.logging.enabled')) {
             return;
         }
 
