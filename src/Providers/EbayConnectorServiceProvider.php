@@ -1,17 +1,12 @@
 <?php
 
-namespace KevinBHarris\EbayConnector\Providers;
+namespace KevinBHarris\Support\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Log;
-use KevinBHarris\EbayConnector\Console\Commands\SyncProductsCommand;
-use KevinBHarris\EbayConnector\Console\Commands\SyncOrdersCommand;
-use KevinBHarris\EbayConnector\Services\EbayApiClient;
-use KevinBHarris\EbayConnector\Services\ProductSyncService;
-use KevinBHarris\EbayConnector\Services\OrderSyncService;
+use Illuminate\Support\Facades\Event;
+use Webkul\Admin\Helpers\Menu;
 
-class EbayConnectorServiceProvider extends ServiceProvider
+class SupportServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
@@ -19,21 +14,13 @@ class EbayConnectorServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../../publishable/config/ebayconnector.php',
-            'ebayconnector'
+            dirname(__DIR__) . '/Config/support.php', 'support'
         );
-
-        // Register services
-        $this->app->singleton(EbayApiClient::class, function ($app) {
-            return new EbayApiClient(
-                config('ebayconnector.api_key'),
-                config('ebayconnector.api_secret'),
-                config('ebayconnector.environment')
-            );
-        });
-
-        $this->app->singleton(ProductSyncService::class);
-        $this->app->singleton(OrderSyncService::class);
+        
+        $this->mergeConfigFrom(
+            dirname(__DIR__).'/Config/menu.php',
+            'menu.admin'
+        );
     }
 
     /**
@@ -41,61 +28,49 @@ class EbayConnectorServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
-        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'ebayconnector');
-        $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'ebayconnector');
+        $this->loadMigrationsFrom(dirname(__DIR__) . '/Database/Migrations');
         
-        $this->registerRoutes();
-        $this->registerCommands();
-        $this->registerPublishables();
-        $this->registerEventListeners();
-        $this->registerMenuItems();
-        $this->registerACL();
-    }
-
-    /**
-     * Register routes.
-     */
-    protected function registerRoutes(): void
-    {
-        Route::group([
-            'middleware' => ['web', 'admin'],
-            'prefix' => config('app.admin_url') . '/ebayconnector',
-            'namespace' => 'KevinBHarris\EbayConnector\Http\Controllers\Admin',
-        ], function () {
-            require __DIR__ . '/../Http/routes.php';
-        });
-    }
-
-    /**
-     * Register console commands.
-     */
-    protected function registerCommands(): void
-    {
+        $this->loadRoutesFrom(dirname(__DIR__) . '/Routes/admin.php');
+        $this->loadRoutesFrom(dirname(__DIR__) . '/Routes/portal.php');
+        
+        $this->loadViewsFrom(dirname(__DIR__) . '/Resources/views', 'support');
+        
+        $this->loadTranslationsFrom(dirname(__DIR__) . '/Resources/lang', 'support');
+        
         if ($this->app->runningInConsole()) {
             $this->commands([
-                SyncProductsCommand::class,
-                SyncOrdersCommand::class,
+                \KevinBHarris\Support\Console\Commands\AutoTransitionTicketsByRule::class,
             ]);
-        }
-    }
 
-    /**
-     * Register publishable resources.
-     */
-    protected function registerPublishables(): void
-    {
-        $this->publishes([
-            __DIR__ . '/../../publishable/config/ebayconnector.php' => config_path('ebayconnector.php'),
-        ], 'ebayconnector-config');
-
-        $this->publishes([
-            __DIR__ . '/../../publishable/assets' => public_path('vendor/ebayconnector'),
-        ], 'ebayconnector-assets');
-
-        $this->publishes([
-            __DIR__ . '/../../resources/views' => resource_path('views/vendor/ebayconnector'),
-        ], 'ebayconnector-views');
+            $this->publishes([
+                dirname(__DIR__) . '/Config/support.php' => config_path('support.php'),
+            ], 'support-config');
+            
+            $this->publishes([
+                dirname(__DIR__) . '/Config/menu.php' => config_path('menu.php'),
+            ], 'support-config');
+            
+            $this->publishes([
+                dirname(__DIR__) . '/Resources/views' => resource_path('views/vendor/support'),
+            ], 'support-views');
+            
+            $this->publishes([
+                dirname(__DIR__) . '/Resources/assets' => public_path('vendor/support'),
+            ], 'support-assets');
+            
+            $this->publishes([
+                dirname(__DIR__) . '/Resources/lang' => resource_path('lang/vendor/support'),
+            ], 'support-lang');
+        }	
+		
+		// Inject the CSS into the Bagisto admin layout
+		view()->composer('*', function ($view) {
+			$view->getFactory()->startPush('styles');
+			echo '<link rel="stylesheet" href="' . asset('vendor/support/css/app.css') . '">';
+			$view->getFactory()->stopPush();
+		});
+        
+        $this->registerEventListeners();
     }
 
     /**
@@ -103,39 +78,19 @@ class EbayConnectorServiceProvider extends ServiceProvider
      */
     protected function registerEventListeners(): void
     {
-        // Event listeners for automatic sync will be registered here
-        // For example: product created, updated, deleted events
-    }
-
-    /**
-     * Register menu items for admin sidebar.
-     */
-    protected function registerMenuItems(): void
-    {
-        if ($this->app->bound('core')) {
-            $menuItems = require __DIR__ . '/../../publishable/config/menu.php';
-
-            foreach ($menuItems as $menuItem) {
-                $this->app['core']->addMenuItems($menuItem);
-            }
-        } else {
-            Log::warning('eBay Connector: Unable to register menu items. Bagisto core binding not found. Please ensure Bagisto is properly installed and cache is cleared.');
-        }
-    }
-
-    /**
-     * Register ACL permissions.
-     */
-    protected function registerACL(): void
-    {
-        if ($this->app->bound('core')) {
-            $aclItems = require __DIR__ . '/../../publishable/config/acl.php';
-
-            foreach ($aclItems as $aclItem) {
-                $this->app['core']->addACL($aclItem);
-            }
-        } else {
-            Log::warning('eBay Connector: Unable to register ACL permissions. Bagisto core binding not found. Please ensure Bagisto is properly installed and cache is cleared.');
-        }
+        Event::listen(
+            \KevinBHarris\Support\Events\TicketCreated::class,
+            \KevinBHarris\Support\Listeners\SendTicketCreatedNotification::class
+        );
+        
+        Event::listen(
+            \KevinBHarris\Support\Events\TicketUpdated::class,
+            \KevinBHarris\Support\Listeners\SendTicketUpdatedNotification::class
+        );
+        
+        Event::listen(
+            \KevinBHarris\Support\Events\NoteAdded::class,
+            \KevinBHarris\Support\Listeners\SendNoteAddedNotification::class
+        );
     }
 }
