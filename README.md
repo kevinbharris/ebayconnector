@@ -201,11 +201,33 @@ ebayconnector/
 │   └── views/admin/               # Blade templates
 ├── publishable/
 │   ├── config/                    # Configuration files
-│   └── assets/                    # CSS, JS, images
+│   └── assets/                    # CSS, JS, fonts, images
+│       ├── css/                   # Custom CSS (including icon font styles)
+│       └── fonts/ebay/            # Custom eBay icon font files
 ├── composer.json
 ├── package.json
 └── README.md
 ```
+
+## Custom Icon Font
+
+The package includes a custom icon font featuring a black and white eBay logo that appears in the Bagisto admin sidebar. The icon font is automatically loaded and styled through the published assets.
+
+### Icon Font Files
+- `ebay-icons.eot` - Embedded OpenType (IE9+ compatibility)
+- `ebay-icons.woff2` - Web Open Font Format 2.0 (modern browsers)
+- `ebay-icons.woff` - Web Open Font Format (legacy browsers)
+- `ebay-icons.ttf` - TrueType Font (fallback)
+- `ebay-icons.svg` - SVG font (legacy browsers)
+
+The icon font is published to `public/vendor/ebayconnector/fonts/ebay/` and the CSS to `public/vendor/ebayconnector/css/ebay-icons.css` when you run:
+
+```bash
+php artisan vendor:publish --tag=ebayconnector-assets
+```
+
+For more details, see `publishable/assets/fonts/ebay/README.md`.
+
 
 ## Author
 

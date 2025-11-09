@@ -1,0 +1,27 @@
+/**
+ * eBay Icons Custom Font
+ * 
+ * Custom icon font for eBay Connector package
+ * Black and white eBay logo icon for Bagisto admin sidebar
+ */
+
+@font-face {
+    font-family: 'ebay-icons';
+    src:  url('../fonts/ebay/ebay-icons.eot');
+    src:  url('../fonts/ebay/ebay-icons.eot?#iefix') format('embedded-opentype'),
+          url('../fonts/ebay/ebay-icons.woff2') format('woff2'),
+          url('../fonts/ebay/ebay-icons.woff') format('woff'),
+          url('../fonts/ebay/ebay-icons.ttf') format('truetype'),
+          url('../fonts/ebay/ebay-icons.svg#ebay-icons') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.icon-ebay:before {
+    font-family: "ebay-icons";
+    content: "\e017";  /* the unicode from IcoMoon */
+    font-size: 22px;
+    vertical-align: middle;
+    display: inline-block;
+    color: #000; /* Black */
+}

@@ -6,7 +6,7 @@ return [
         'name'       => 'eBay Connector',
         'route'      => 'admin.configuration.index',
         'sort'       => 7,
-        'icon'       => 'icon-integration',
+        'icon'       => 'icon-ebay',
     ],
     [
         'key'        => 'ebayconnector.products',

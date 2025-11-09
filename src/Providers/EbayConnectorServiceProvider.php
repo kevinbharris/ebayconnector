@@ -90,6 +90,11 @@ class EbayConnectorServiceProvider extends ServiceProvider
             $this->publishes([
                 dirname(__DIR__, 2) . '/resources/views' => resource_path('views/vendor/ebayconnector'),
             ], 'ebayconnector-views');
+            
+            // Publish assets (CSS and fonts)
+            $this->publishes([
+                dirname(__DIR__, 2) . '/publishable/assets' => public_path('vendor/ebayconnector'),
+            ], 'ebayconnector-assets');
         }
         
         // Register event listeners
