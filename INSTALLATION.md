@@ -52,7 +52,7 @@ php artisan vendor:publish --tag=ebayconnector-assets
 
 This will publish:
 - Custom eBay icon font files to `public/vendor/ebayconnector/fonts/ebay/`
-- Icon font CSS to `public/vendor/ebayconnector/css/ebay-icons.css`
+- Icon font CSS to `public/vendor/ebayconnector/css/app.css`
 
 **Note:** The custom eBay icon font provides a black and white eBay logo that appears in the Bagisto admin sidebar next to "eBay Connector".
 

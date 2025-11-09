@@ -16,7 +16,7 @@ This will copy the following files to your public directory:
 ```
 public/vendor/ebayconnector/
 ├── css/
-│   └── ebay-icons.css
+│   └── app.css
 └── fonts/ebay/
     ├── ebay-icons.eot
     ├── ebay-icons.woff2
@@ -50,7 +50,7 @@ If you need to use the icon elsewhere in your views, you can include it manually
 In your Blade template, add the stylesheet:
 
 ```blade
-<link rel="stylesheet" href="{{ asset('vendor/ebayconnector/css/ebay-icons.css') }}">
+<link rel="stylesheet" href="{{ asset('vendor/ebayconnector/css/app.css') }}">
 ```
 
 ### 2. Use the Icon
@@ -126,7 +126,7 @@ If you need to create or update the icon font:
 3. Generate the font with the name "ebay-icons"
 4. Download the font package
 5. Replace the files in `publishable/assets/fonts/ebay/`
-6. Update the unicode character in `ebay-icons.css` if needed
+6. Update the unicode character in `app.css` if needed
 7. Republish assets: `php artisan vendor:publish --tag=ebayconnector-assets --force`
 
 ## Troubleshooting

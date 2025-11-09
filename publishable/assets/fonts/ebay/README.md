@@ -12,7 +12,7 @@ This directory contains the custom icon font for the eBay Connector package.
 - `ebay-icons.svg` - SVG font (legacy browsers)
 
 ### CSS File
-- `../css/ebay-icons.css` - Font-face definition and icon class
+- `../css/app.css` - Font-face definition and icon class
 
 ## Usage
 
@@ -24,7 +24,7 @@ php artisan vendor:publish --tag=ebayconnector-assets
 The icon font will be available at:
 ```
 public/vendor/ebayconnector/fonts/ebay/
-public/vendor/ebayconnector/css/ebay-icons.css
+public/vendor/ebayconnector/css/app.css
 ```
 
 ## Icon Class
@@ -40,7 +40,7 @@ The `icon-ebay` class is used in the admin sidebar menu. It displays a black and
 To create custom icon fonts:
 1. Use IcoMoon or similar tool to generate font files
 2. Replace the files in this directory
-3. Update the unicode character in `ebay-icons.css` if needed
+3. Update the unicode character in `app.css` if needed
 4. Republish assets
 
 ## Integration
